@@ -9,42 +9,42 @@ import { ApiResponse, Product } from '../models/product.model';
 export class ProductService {
   constructor(private apiBaseService: ApiBaseService) {}
 
-  // Obtener todos los productos con paginación
+  // Get all products with pagination
   getAllProducts(limit: number = 30, skip: number = 0): Observable<ApiResponse<Product>> {
     return this.apiBaseService.get<ApiResponse<Product>>('products', { limit, skip });
   }
 
-  // Obtener un producto por ID
+  // Get a product by ID
   getProductById(id: number): Observable<Product> {
     return this.apiBaseService.get<Product>(`products/${id}`);
   }
 
-  // Buscar productos por nombre o palabra clave
+  // Search products by name or keyword
   searchProducts(query: string): Observable<ApiResponse<Product>> {
     return this.apiBaseService.get<ApiResponse<Product>>('products/search', { q: query });
   }
 
-  // Obtener categorías de productos
+  // Get all product categories
   getAllCategories(): Observable<string[]> {
     return this.apiBaseService.get<string[]>('products/categories');
   }
 
-  // Obtener productos por categoría
+  // Get products by category
   getProductsByCategory(category: string): Observable<ApiResponse<Product>> {
     return this.apiBaseService.get<ApiResponse<Product>>(`products/category/${category}`);
   }
 
-  // Agregar un nuevo producto
+  // Add a new product
   addProduct(productData: Partial<Product>): Observable<Product> {
     return this.apiBaseService.post<Product>('products/add', productData);
   }
 
-  // Actualizar un producto
+  // Update an existing product
   updateProduct(id: number, updatedData: Partial<Product>): Observable<Product> {
     return this.apiBaseService.put<Product>(`products/${id}`, updatedData);
   }
 
-  // Eliminar un producto
+  // Delete a product
   deleteProduct(id: number): Observable<void> {
     return this.apiBaseService.delete<void>(`products/${id}`);
   }
