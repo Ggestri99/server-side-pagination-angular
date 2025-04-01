@@ -10,6 +10,15 @@ export interface Product {
     category: string;
     thumbnail: string;
     images: string[];
+    reviews: Review[];
+  }
+
+  interface Review {
+    comment: string;
+    date: string;
+    rating: number;
+    reviewerEmail: string;
+    reviewerName: string;
   }
   
   export interface ApiResponse<T> {

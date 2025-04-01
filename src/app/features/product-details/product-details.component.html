@@ -148,7 +148,31 @@
           </div>
         </mat-tab>
         <mat-tab label="Comments">
-          <p class="tab-content">Comments section under development...</p>
+          @for(prod of product()!.reviews.slice(0,3) ; track idx; let idx = $index) {
+          <div class="comment-card" [ngClass]="{ 'highlighted': idx % 2 === 0 }">
+            <div class="comment-header">
+              <span class="comment-author">{{ prod.reviewerName }}</span>
+              <span class="comment-date">{{ prod.date | date }}</span>
+            </div>
+            <div class="comment-rating">
+              @for(star of [1, 2, 3, 4, 5]; track idx; let idx = $index) {
+              <mat-icon>
+                {{
+                  star <= prod.rating
+                    ? "star"
+                    : star - 0.5 <= prod.rating
+                    ? "star_half"
+                    : "star_border"
+                }}
+              </mat-icon>
+              }
+            </div>
+            <p>{{ prod.comment }}</p>
+            <div class="comment-footer">
+              <span class="comment-like">{{ prod.rating }} Likes</span>
+            </div>
+          </div>
+          }
         </mat-tab>
       </mat-tab-group>
     </div>

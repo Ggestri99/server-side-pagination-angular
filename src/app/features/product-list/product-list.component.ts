@@ -114,4 +114,5 @@ export class ProductListComponent implements OnInit {
     this.router.navigate(['features/product-details', productId]);
   }
 
+
 }

@@ -207,3 +207,50 @@
   display: flex;
   justify-content: space-between;
 }
+
+.comment-card {
+  padding: 16px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s;
+
+  &.highlighted {
+    background-color: #f0f8ff;
+  }
+
+  .comment-header {
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .comment-rating {
+    margin: 8px 0;
+    
+    mat-icon {
+      color: gold;
+    }
+  }
+
+  .comment-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .comment-reply {
+    cursor: pointer;
+    color: #0066cc;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .comment-like {
+    font-weight: bold;
+  }
+}
