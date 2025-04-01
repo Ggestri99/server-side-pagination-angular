@@ -1,1 +1,181 @@
-<p>product-details works!</p>
+<div class="product-details-container">
+  <div class="header-actions">
+    <button mat-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon> Back to list
+    </button>
+
+    @if(!loading() && !error() && product()) {
+    <button mat-raised-button color="primary" (click)="openEditModal()">
+      <mat-icon>edit</mat-icon> Edit Product
+    </button>
+    }
+  </div>
+
+  @if (loading()) {
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+  } @if(error()) {
+  <div class="error-container">
+    <h2>Oops! Something went wrong.</h2>
+    <p>We couldn't load the product information.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Back to product list
+    </button>
+  </div>
+  } @if(product()) {
+  <div class="product-content">
+    <div class="product-header">
+      <h1>{{ product()?.title }}</h1>
+      <div class="product-brand-category">
+        <mat-chip>{{ product()?.brand }}</mat-chip>
+        <mat-chip>{{ product()?.category }}</mat-chip>
+      </div>
+    </div>
+
+    <div class="product-main">
+      <div class="product-gallery">
+        <div class="main-image">
+          <img
+            [src]="product()!.images[activeImageIndex]"
+            [alt]="product()?.title"
+          />
+        </div>
+        <div class="thumbnails">
+          @for(image of product()!.images; track idx; let idx = $index) {
+          <img
+            [src]="image"
+            [alt]="'Image ' + (idx + 1)"
+            [class.active]="idx === activeImageIndex"
+            (click)="setActiveImage(idx)"
+          />
+          }
+        </div>
+      </div>
+
+      <div class="product-info">
+        <mat-card>
+          <mat-card-content>
+            <div class="price-section">
+              <div class="price-info">
+                <h2 class="price">
+                  {{
+                    getConvertedPrice(product()!.price)
+                      | currencyFormat : getCurrencySymbol()
+                  }}
+                </h2>
+                <mat-button-toggle-group
+                  [value]="selectedCurrency()"
+                  (change)="changeCurrency($event.value)"
+                  aria-label="Currency selector"
+                  class="currency-toggle"
+                >
+                  <mat-button-toggle value="USD">USD ($)</mat-button-toggle>
+                  <mat-button-toggle value="EUR">EUR (€)</mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+              @if(product()!.discountPercentage > 0) {
+              <div class="discount">
+                <span class="discount-badge"
+                  >-{{ product()!.discountPercentage }}%</span
+                >
+                <span class="original-price">{{
+                  getConvertedPrice(
+                    product()!.price / (1 - product()!.discountPercentage / 100)
+                  ) | currencyFormat : getCurrencySymbol()
+                }}</span>
+              </div>
+              }
+            </div>
+
+            <div class="stock-rating">
+              <div class="stock" [class.low-stock]="product()!.stock < 10">
+                <mat-icon>inventory_2</mat-icon>
+                <span>{{ product()?.stock }} in stock</span>
+              </div>
+              <div class="rating">
+                @for(star of [1, 2, 3, 4, 5]; track idx; let idx = $index) {
+                <mat-icon>
+                  {{
+                    star <= product()!.rating
+                      ? "star"
+                      : star - 0.5 <= product()!.rating
+                      ? "star_half"
+                      : "star_border"
+                  }}
+                </mat-icon>
+
+                }
+                <span>{{ product()!.rating }}/5</span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="description">
+              <h3>Description</h3>
+              <p>{{ product()?.description }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="product-details">
+      <mat-tab-group>
+        <mat-tab label="Specifications">
+          <div class="specs-table">
+            <div class="spec-row">
+              <div class="spec-label">Brand</div>
+              <div class="spec-value">{{ product()?.brand }}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Category</div>
+              <div class="spec-value">{{ product()?.category }}</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Rating</div>
+              <div class="spec-value">{{ product()?.rating }}/5</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Stock</div>
+              <div class="spec-value">{{ product()?.stock }} units</div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">ID</div>
+              <div class="spec-value">{{ product()?.id }}</div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Comments">
+          @for(prod of product()!.reviews.slice(0,3) ; track idx; let idx = $index) {
+          <div class="comment-card" [ngClass]="{ 'highlighted': idx % 2 === 0 }">
+            <div class="comment-header">
+              <span class="comment-author">{{ prod.reviewerName }}</span>
+              <span class="comment-date">{{ prod.date | date }}</span>
+            </div>
+            <div class="comment-rating">
+              @for(star of [1, 2, 3, 4, 5]; track idx; let idx = $index) {
+              <mat-icon>
+                {{
+                  star <= prod.rating
+                    ? "star"
+                    : star - 0.5 <= prod.rating
+                    ? "star_half"
+                    : "star_border"
+                }}
+              </mat-icon>
+              }
+            </div>
+            <p>{{ prod.comment }}</p>
+            <div class="comment-footer">
+              <span class="comment-like">{{ prod.rating }} Likes</span>
+            </div>
+          </div>
+          }
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+  }
+</div>
