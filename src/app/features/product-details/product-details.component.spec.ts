@@ -9,6 +9,12 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { EditProductModalComponent } from './edit/edit-product-modal.component';
 
+/**
+ * Unit tests for ProductDetailsComponent.
+ * 
+ * Tests component initialization, navigation, and modal interactions.
+ */
+
 describe('ProductDetailsComponent', () => {
   let component: ProductDetailsComponent;
   let fixture: ComponentFixture<ProductDetailsComponent>;
@@ -47,12 +53,19 @@ describe('ProductDetailsComponent', () => {
     fixture.detectChanges();
   });
 
+    /**
+   * Ensures the component initializes correctly.
+   */
+
   it('should initialize component and call ngOnInit', () => {
     spyOn(component, 'ngOnInit').and.callThrough();
     component.ngOnInit();
     expect(component.ngOnInit).toHaveBeenCalled();
   });
 
+    /**
+   * Verifies navigation to the product list when goBack() is triggered.
+   */
   it('should navigate to /products when goBack() is called', () => {
     spyOn(router, 'navigate');
     component.goBack();

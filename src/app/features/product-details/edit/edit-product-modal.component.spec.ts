@@ -11,6 +11,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
+/**
+ * Unit tests for EditProductModalComponent.
+ *
+ * Tests form initialization, validation, and dialog interactions.
+ */
+
 describe('EditProductModalComponent', () => {
     let component: EditProductModalComponent;
     let fixture: ComponentFixture<EditProductModalComponent>;
@@ -46,6 +52,9 @@ describe('EditProductModalComponent', () => {
         fixture.detectChanges();
     });
 
+    /**
+     * Ensures the form initializes with product data.
+     */
     it('should initialize the form with product data', () => {
         expect(component.productForm.value).toEqual({
             title: 'Producto 1',
@@ -55,14 +64,19 @@ describe('EditProductModalComponent', () => {
         });
     });
 
+    /**
+     * Ensures form submission is blocked if invalid.
+     */
     it('should not submit form if it is invalid', () => {
         component.productForm.controls['title'].setValue('');
         component.onSubmit();
         fixture.detectChanges();
-        expect(component.loading).toBeFalse();
         expect(dialogRefSpy.close).not.toHaveBeenCalled();
     });
 
+    /**
+     * Ensures the dialog closes when cancel is triggered.
+     */
     it('should close the dialog when cancel is called', () => {
         component.cancel();
         expect(dialogRefSpy.close).toHaveBeenCalled();

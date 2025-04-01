@@ -12,6 +12,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { of } from 'rxjs';
 
+/**
+ * Unit tests for ProductListComponent.
+ *
+ * Tests component creation, data initialization, product fetching, 
+ * and currency change behavior.
+ */
+
 describe('ProductListComponent', () => {
   let component: ProductListComponent;
   let fixture: ComponentFixture<ProductListComponent>;
@@ -49,18 +56,30 @@ describe('ProductListComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+  * Ensures the component is created successfully.
+  */
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  /**
+   * Ensures the product list initializes as empty.
+   */
   it('should initialize with an empty product list', () => {
     expect(component.dataSource.data.length).toBe(0);
   });
 
+  /**
+   * Ensures getAllProducts is called on component initialization.
+   */
   it('should call getAllProducts on initialization', () => {
     expect(productServiceSpy.getAllProducts).toHaveBeenCalledWith(10, 0);
   });
 
+  /**
+   * Ensures currency changes correctly when changeCurrency is called.
+   */
   it('should change currency when changeCurrency is called', () => {
     component.changeCurrency('EUR');
     expect(currencyServiceSpy.setCurrency).toHaveBeenCalledWith('EUR');
