@@ -49,6 +49,7 @@ export class ProductListComponent implements OnInit {
 
   private pageChanges = new BehaviorSubject<{ pageIndex: number; pageSize: number }>({ pageIndex: 0, pageSize: 10 });
   private currencyChanges = new BehaviorSubject<Currency>('USD');
+  private categoryChanges = new BehaviorSubject<string>('all'); // Nuevo BehaviorSubject para categorías
 
   totalItems = 0;
   pageSize = 10;
@@ -58,10 +59,14 @@ export class ProductListComponent implements OnInit {
   currencies: Currency[] = ['USD', 'EUR'];
 
   ngOnInit(): void {
-    combineLatest([this.pageChanges, this.currencyChanges]).pipe(
-      switchMap(([{ pageIndex, pageSize }, currency]) =>
-        this.productService.getAllProducts(pageSize, pageIndex * pageSize)
-      )
+    combineLatest([this.pageChanges, this.currencyChanges, this.categoryChanges]).pipe(
+      switchMap(([{ pageIndex, pageSize }, currency, category]) => {
+        if (category === 'all') {
+          return this.productService.getAllProducts(pageSize, pageIndex * pageSize);
+        } else {
+          return this.productService.getProductsByCategory(category, pageSize, pageIndex * pageSize);
+        }
+      })
     ).subscribe(response => {
       this.dataSource.data = response.products;
       this.totalItems = response.total;
@@ -90,26 +95,15 @@ export class ProductListComponent implements OnInit {
   }
 
   filterByCategory(category: string): void {
-
     // Reiniciar la paginación cuando se cambia de categoría
     this.currentPage = 0;
     if (this.paginator) {
       this.paginator.pageIndex = 0;
     }
-    if (category === 'all') {
-      this.productService.getAllProducts(this.pageSize, this.currentPage * this.pageSize)
-        .subscribe(response => {
-          this.dataSource.data = response.products;
-          this.totalItems = response.total;
-        });
-    } else {
-      this.productService.getProductsByCategory(category, this.pageSize, this.currentPage * this.pageSize)
-        .subscribe(response => {
-          this.dataSource.data = response.products;
-          this.totalItems = response.total;
-        });
-    }
-
+    
+    // Actualizar el BehaviorSubject de categoría
+    this.categoryChanges.next(category);
+    
     // Actualizar el estado de la paginación
     this.pageChanges.next({ pageIndex: this.currentPage, pageSize: this.pageSize });
   }

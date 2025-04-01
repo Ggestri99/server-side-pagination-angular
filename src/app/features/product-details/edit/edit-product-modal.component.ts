@@ -59,7 +59,7 @@ export class EditProductModalComponent implements OnInit {
     // Simulamos una llamada al servidor con un retraso
     setTimeout(() => {
       // Simulamos una actualización exitosa (90% de las veces)
-      const isSuccess = Math.random() < 0.9;
+      const isSuccess = Math.random() < 0.4;
 
       if (isSuccess) {
         const updatedProduct: Product = {
@@ -74,7 +74,7 @@ export class EditProductModalComponent implements OnInit {
         });
         this.dialogRef.close(updatedProduct);
       } else {
-        this.snackBar.open('Error al actualizar el producto. Inténtalo de nuevo.', 'Cerrar', {
+        this.snackBar.open('Simulacion: Error al actualizar el producto. Inténtalo de nuevo.', 'Cerrar', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',

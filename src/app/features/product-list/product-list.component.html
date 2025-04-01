@@ -1,35 +1,38 @@
-<div class="d-flex">
+<div class="d-flex w-100">
   <div>
     <!-- Sidebar de categorías -->
     <app-category-sidebar
       (categorySelected)="filterByCategory($event)"
     ></app-category-sidebar>
   </div>
-  <div>
-    <!-- Filtro de búsqueda -->
-    <mat-form-field>
-      <mat-label>Buscar</mat-label>
-      <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Mia" />
-    </mat-form-field>
 
-    <!-- Selector de moneda -->
-    <div class="currency-selector">
-      <span>Moneda:</span>
-      <mat-button-toggle-group
-        [value]="selectedCurrency"
-        (change)="changeCurrency($event.value)"
-      >
-        <mat-button-toggle value="USD">USD ($)</mat-button-toggle>
-        <mat-button-toggle value="EUR">EUR (€)</mat-button-toggle>
-      </mat-button-toggle-group>
+  <div class="d-flex flex-column align-items-center w-100">
+    <div class="d-flex justify-content-between w-60">
+      <!-- Filtro de búsqueda -->
+      <mat-form-field>
+        <mat-label>Search</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="E.g.: Mia" />
+      </mat-form-field>
+
+      <!-- Selector de moneda -->
+      <div class="currency-selector">
+        <span>Currency:</span>
+        <mat-button-toggle-group
+          [value]="selectedCurrency"
+          (change)="changeCurrency($event.value)"
+        >
+          <mat-button-toggle value="USD">USD ($)</mat-button-toggle>
+          <mat-button-toggle value="EUR">EUR (€)</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
     </div>
 
     <!-- Tabla de productos -->
-    <div class="mat-elevation-z8">
+    <div class="mat-elevation-z8 w-60">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
         <!-- Imagen -->
         <ng-container matColumnDef="image">
-          <th mat-header-cell *matHeaderCellDef>Imagen</th>
+          <th mat-header-cell *matHeaderCellDef>Image</th>
           <td mat-cell *matCellDef="let product">
             <img
               [src]="product.images[0]"
@@ -42,19 +45,29 @@
 
         <!-- Nombre -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Nombre</th>
-          <td mat-cell *matCellDef="let product">{{ product.title }}</td>
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td
+            mat-cell
+            *matCellDef="let product"
+            [ngClass]="{
+              'stock-danger': product.stock === 0,
+              'stock-warning': product.stock > 0 && product.stock < 50,
+              'stock-normal': product.stock >= 50
+            }"
+          >
+            {{ product.title }}
+          </td>
         </ng-container>
 
         <!-- Marca -->
         <ng-container matColumnDef="brand">
-          <th mat-header-cell *matHeaderCellDef>Marca</th>
+          <th mat-header-cell *matHeaderCellDef>Brand</th>
           <td mat-cell *matCellDef="let product">{{ product.brand }}</td>
         </ng-container>
 
         <!-- Precio -->
         <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef>Precio</th>
+          <th mat-header-cell *matHeaderCellDef>Price</th>
           <td mat-cell *matCellDef="let product">
             {{
               getConvertedPrice(product.price)
@@ -66,26 +79,33 @@
         <!-- Stock -->
         <ng-container matColumnDef="stock">
           <th mat-header-cell *matHeaderCellDef>Stock</th>
-          <td mat-cell *matCellDef="let product">{{ product.stock }}</td>
+          <td
+            mat-cell
+            *matCellDef="let product"
+            [ngClass]="{
+              'stock-danger': product.stock === 0,
+              'stock-warning': product.stock > 0 && product.stock < 50,
+              'stock-normal': product.stock >= 50
+            }"
+          >
+            {{ product.stock }}
+          </td>
         </ng-container>
 
         <!-- Rating -->
         <ng-container matColumnDef="rating">
-          <th mat-header-cell *matHeaderCellDef>Calificación</th>
+          <th mat-header-cell *matHeaderCellDef>Rating</th>
           <td mat-cell *matCellDef="let product">{{ product.rating }}</td>
         </ng-container>
 
         <!-- Acciones -->
         <!-- En la sección de columna "actions" -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let product">
-            <button mat-button (click)="viewProduct(product.id)">
-              Ver
-            </button>
-            <button mat-button>Editar</button>
-          </td> </ng-container
-        >
+            <button mat-button (click)="viewProduct(product.id)">View</button>
+          </td>
+        </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>

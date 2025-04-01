@@ -1,7 +1,7 @@
 <div class="product-details-container">
   <div class="header-actions">
     <button mat-button (click)="goBack()" class="back-button">
-      <mat-icon>arrow_back</mat-icon> Volver a la lista
+      <mat-icon>arrow_back</mat-icon> Back to list
     </button>
 
     <button
@@ -10,7 +10,7 @@
       (click)="openEditModal()"
       *ngIf="!loading && !error && product"
     >
-      <mat-icon>edit</mat-icon> Editar Producto
+      <mat-icon>edit</mat-icon> Edit Product
     </button>
   </div>
 
@@ -19,10 +19,10 @@
   </div>
 
   <div *ngIf="error" class="error-container">
-    <h2>¡Ups! Algo salió mal.</h2>
-    <p>No pudimos cargar la información del producto.</p>
+    <h2>Oops! Something went wrong.</h2>
+    <p>We couldn't load the product information.</p>
     <button mat-raised-button color="primary" (click)="goBack()">
-      Volver a la lista de productos
+      Back to product list
     </button>
   </div>
 
@@ -44,7 +44,7 @@
           <img
             *ngFor="let image of product.images; let i = index"
             [src]="image"
-            [alt]="'Imagen ' + (i + 1)"
+            [alt]="'Image ' + (i + 1)"
             [class.active]="i === activeImageIndex"
             (click)="setActiveImage(i)"
           />
@@ -76,7 +76,7 @@
             <div class="stock-rating">
               <div class="stock" [class.low-stock]="product.stock < 10">
                 <mat-icon>inventory_2</mat-icon>
-                <span>{{ product.stock }} en stock</span>
+                <span>{{ product.stock }} in stock</span>
               </div>
               <div class="rating">
                 <mat-icon *ngFor="let star of [1, 2, 3, 4, 5]">
@@ -95,7 +95,7 @@
             <mat-divider></mat-divider>
 
             <div class="description">
-              <h3>Descripción</h3>
+              <h3>Description</h3>
               <p>{{ product.description }}</p>
             </div>
           </mat-card-content>
@@ -105,23 +105,23 @@
 
     <div class="product-details">
       <mat-tab-group>
-        <mat-tab label="Especificaciones">
+        <mat-tab label="Specifications">
           <div class="specs-table">
             <div class="spec-row">
-              <div class="spec-label">Marca</div>
+              <div class="spec-label">Brand</div>
               <div class="spec-value">{{ product.brand }}</div>
             </div>
             <div class="spec-row">
-              <div class="spec-label">Categoría</div>
+              <div class="spec-label">Category</div>
               <div class="spec-value">{{ product.category }}</div>
             </div>
             <div class="spec-row">
-              <div class="spec-label">Calificación</div>
+              <div class="spec-label">Rating</div>
               <div class="spec-value">{{ product.rating }}/5</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">Stock</div>
-              <div class="spec-value">{{ product.stock }} unidades</div>
+              <div class="spec-value">{{ product.stock }} units</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">ID</div>
@@ -129,13 +129,8 @@
             </div>
           </div>
         </mat-tab>
-        <mat-tab label="Comentarios">
-          <p class="tab-content">Sección de comentarios en desarrollo...</p>
-        </mat-tab>
-        <mat-tab label="Productos relacionados">
-          <p class="tab-content">
-            Sección de productos relacionados en desarrollo...
-          </p>
+        <mat-tab label="Comments">
+          <p class="tab-content">Comments section under development...</p>
         </mat-tab>
       </mat-tab-group>
     </div>
