@@ -44,7 +44,7 @@ export class ApiBaseService {
   // Error handling for HTTP requests
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred!';
-    if (error.error instanceof ErrorEvent) {
+    if (error.error) {
       // Client-side error
       errorMessage = `Client-side error: ${error.error.message}`;
     } else {

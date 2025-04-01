@@ -16,12 +16,11 @@ export const authRoutes = [
         loadComponent: () => import('./product-list/product-list.component').then((m) => m.ProductListComponent),
     },
     {
-        path: FEATURES_ROUTES.PRODUCT_DETAILS,
+        path: `${FEATURES_ROUTES.PRODUCT_DETAILS}/:id`,
         loadComponent: () => import('./product-details/product-details.component').then((m) => m.ProductDetailsComponent),
     },
     {
         path: '**',
         redirectTo: FEATURES_ROUTES.PRODUCT_LIST,
     }
-
 ] satisfies Routes;

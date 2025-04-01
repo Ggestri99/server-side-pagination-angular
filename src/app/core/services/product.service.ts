@@ -2,16 +2,21 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiBaseService } from './api-base.service';
 import { ApiResponse, Product } from '../models/product.model';
+import { Category } from '../models/category.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  constructor(private apiBaseService: ApiBaseService) {}
+  constructor(private apiBaseService: ApiBaseService) { }
 
   // Get all products with pagination
-  getAllProducts(limit: number = 30, skip: number = 0): Observable<ApiResponse<Product>> {
+  getAllProducts(limit: number = 10, skip: number = 0): Observable<ApiResponse<Product>> {
     return this.apiBaseService.get<ApiResponse<Product>>('products', { limit, skip });
+  }
+  // Get all products without pagination
+  getAllProductsUnpaginated(): Observable<Product[]> {
+    return this.apiBaseService.get<Product[]>('products');
   }
 
   // Get a product by ID
@@ -25,14 +30,19 @@ export class ProductService {
   }
 
   // Get all product categories
-  getAllCategories(): Observable<string[]> {
-    return this.apiBaseService.get<string[]>('products/categories');
+  getAllCategories(): Observable<Category[]> {
+    return this.apiBaseService.get<Category[]>('products/categories');
   }
 
   // Get products by category
-  getProductsByCategory(category: string): Observable<ApiResponse<Product>> {
-    return this.apiBaseService.get<ApiResponse<Product>>(`products/category/${category}`);
-  }
+// Get products by category
+getProductsByCategory(category: string, limit: number = 10, skip: number = 0): Observable<ApiResponse<Product>> {
+  const encodedCategory = encodeURIComponent(category);
+  return this.apiBaseService.get<ApiResponse<Product>>(
+    `products/category/${encodedCategory}`, 
+    { limit, skip }
+  );
+}
 
   // Add a new product
   addProduct(productData: Partial<Product>): Observable<Product> {
