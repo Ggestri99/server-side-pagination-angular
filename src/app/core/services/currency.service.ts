@@ -14,7 +14,6 @@ export class CurrencyService {
 
   private currencySubject: BehaviorSubject<Currency>;
 
-  /** Observable para suscribirse a cambios de moneda */
   currency$;
 
   constructor(private storageService: StorageService) {
@@ -23,25 +22,15 @@ export class CurrencyService {
     this.currency$ = this.currencySubject.asObservable();
   }
 
-  /**
-   * Obtiene la moneda inicial desde el almacenamiento o usa el valor por defecto.
-   */
   private getInitialCurrency(): Currency {
     const storedCurrency = this.storageService.getItem<Currency>(this.STORAGE_KEY);
     return storedCurrency === 'USD' || storedCurrency === 'EUR' ? storedCurrency : this.DEFAULT_CURRENCY;
   }
 
-  /**
-   * Obtiene la moneda actual
-   */
   get currentCurrency(): Currency {
     return this.currencySubject.value;
   }
 
-  /**
-   * Cambia la moneda y la almacena en localStorage
-   * @param currency Nueva moneda (USD o EUR)
-   */
   setCurrency(currency: Currency): void {
     if (this.currentCurrency !== currency) {
       this.currencySubject.next(currency);
@@ -49,19 +38,26 @@ export class CurrencyService {
     }
   }
 
-  /**
-   * Convierte un monto según la moneda actual.
-   * @param amount Monto en USD
-   * @returns Monto convertido a EUR si la moneda es EUR, de lo contrario, devuelve el mismo monto.
-   */
-  convertAmount(amount: number): number {
-    return this.currentCurrency === 'EUR' ? amount * this.EXCHANGE_RATE_USD_TO_EUR : amount;
-  }
 
-  /**
-   * Devuelve el símbolo de la moneda actual.
-   */
   getCurrencySymbol(): string {
     return this.currentCurrency === 'USD' ? '$' : '€';
+  }
+
+  convertAmount(amount: number): number {
+    if (this.currentCurrency === 'USD') {
+      return amount;
+    } else if (this.currentCurrency === 'EUR') {
+      return Math.round((amount * 1.1) * 100) / 100;
+    }
+    return amount;
+  }
+
+  convertToUSD(amount: number): number {
+    if (this.currentCurrency === 'USD') {
+      return amount;
+    } else if (this.currentCurrency === 'EUR') {
+      return Math.round((amount / 1.1) * 100) / 100;
+    }
+    return amount;
   }
 }

@@ -16,6 +16,7 @@ import { CategorySidebarComponent } from '../../shared/components/category-sideb
 import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { StockColorDirective } from '../../shared/directives/stock-color.directive';
 
 @Component({
   selector: 'app-product-list',
@@ -31,7 +32,8 @@ import { MatButtonModule } from '@angular/material/button';
     CategorySidebarComponent,
     RouterModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    StockColorDirective
   ],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
@@ -49,7 +51,7 @@ export class ProductListComponent implements OnInit {
 
   private pageChanges = new BehaviorSubject<{ pageIndex: number; pageSize: number }>({ pageIndex: 0, pageSize: 10 });
   private currencyChanges = new BehaviorSubject<Currency>('USD');
-  private categoryChanges = new BehaviorSubject<string>('all'); // Nuevo BehaviorSubject para categorías
+  private categoryChanges = new BehaviorSubject<string>('all');
 
   totalItems = 0;
   pageSize = 10;
@@ -95,16 +97,11 @@ export class ProductListComponent implements OnInit {
   }
 
   filterByCategory(category: string): void {
-    // Reiniciar la paginación cuando se cambia de categoría
     this.currentPage = 0;
     if (this.paginator) {
       this.paginator.pageIndex = 0;
     }
-    
-    // Actualizar el BehaviorSubject de categoría
     this.categoryChanges.next(category);
-    
-    // Actualizar el estado de la paginación
     this.pageChanges.next({ pageIndex: this.currentPage, pageSize: this.pageSize });
   }
 
@@ -114,8 +111,7 @@ export class ProductListComponent implements OnInit {
   }
 
   viewProduct(productId: any) {
-    console.log('Ver producto:', productId);
     this.router.navigate(['features/product-details', productId]);
   }
-    
+
 }

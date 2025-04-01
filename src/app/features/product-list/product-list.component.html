@@ -49,11 +49,8 @@
           <td
             mat-cell
             *matCellDef="let product"
-            [ngClass]="{
-              'stock-danger': product.stock === 0,
-              'stock-warning': product.stock > 0 && product.stock < 50,
-              'stock-normal': product.stock >= 50
-            }"
+            appStockColor
+            [stockValue]="product.stock"
           >
             {{ product.title }}
           </td>
@@ -82,11 +79,8 @@
           <td
             mat-cell
             *matCellDef="let product"
-            [ngClass]="{
-              'stock-danger': product.stock === 0,
-              'stock-warning': product.stock > 0 && product.stock < 50,
-              'stock-normal': product.stock >= 50
-            }"
+            appStockColor
+            [stockValue]="product.stock"
           >
             {{ product.stock }}
           </td>

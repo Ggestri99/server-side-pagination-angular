@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -13,23 +13,21 @@ import { Category } from '../../../core/models/category.model';
   templateUrl: './category-sidebar.component.html',
   styleUrls: ['./category-sidebar.component.scss']
 })
-export class CategorySidebarComponent implements OnInit {
-  productService = inject(ProductService);
+export class CategorySidebarComponent {
+  private productService = inject(ProductService);
 
   @Output() categorySelected = new EventEmitter<string>();
-  
-  categories: Category[] = []; 
 
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
+  categories: WritableSignal<Category[]> = signal<Category[]>([]);
+
+  constructor() {
     this.getCategories();
   }
 
-  getCategories() {
+  private getCategories(): void {
     this.productService.getAllCategories().subscribe((categories: Category[]) => {
-      this.categories = categories;      
-    })
+      this.categories.set(categories); 
+    });
   }
 
   selectCategory(category: string): void {

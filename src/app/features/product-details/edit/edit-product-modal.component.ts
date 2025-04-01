@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Product } from '../../../core/models/product.model';
+import { Currency, CurrencyService } from '../../../core/services/currency.service';
+import { StorageService } from '../../../core/services/storage.service';
 
 @Component({
   selector: 'app-edit-product-modal',
@@ -27,26 +29,42 @@ import { Product } from '../../../core/models/product.model';
 })
 export class EditProductModalComponent implements OnInit {
   productForm!: FormGroup;
-  loading = false;
-  
+  loading = signal(false);
+  currentCurrency = signal<Currency>('USD');
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditProductModalComponent>,
     private snackBar: MatSnackBar,
+    private currencyService: CurrencyService,
+    private storageService: StorageService,
     @Inject(MAT_DIALOG_DATA) public data: { product: Product }
   ) { }
 
   ngOnInit(): void {
+    this.loadCurrentCurrency();
     this.createForm();
   }
 
+  loadCurrentCurrency(): void {
+    const storedCurrency = this.storageService.getItem<Currency>('currency');
+    if (storedCurrency) {
+      this.currentCurrency.set(storedCurrency);
+    }
+  }
+
   createForm(): void {
+    const convertedPrice = this.currencyService.convertAmount(this.data.product.price);
     this.productForm = this.fb.group({
       title: [this.data.product.title, [Validators.required, Validators.minLength(3)]],
-      price: [this.data.product.price, [Validators.required, Validators.min(0)]],
+      price: [convertedPrice, [Validators.required, Validators.min(0)]],
       stock: [this.data.product.stock, [Validators.required, Validators.min(0), Validators.pattern('^[0-9]*$')]],
       description: [this.data.product.description, [Validators.required, Validators.minLength(10)]]
     });
+  }
+
+  getCurrencySymbol(): string {
+    return this.currencyService.getCurrencySymbol();
   }
 
   onSubmit(): void {
@@ -54,19 +72,21 @@ export class EditProductModalComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
-    // Simulamos una llamada al servidor con un retraso
+    const formValues = { ...this.productForm.value };
+    if (this.currentCurrency() === 'EUR') {
+      formValues.price = this.currencyService.convertToUSD(formValues.price);
+    }
+
     setTimeout(() => {
-      // Simulamos una actualización exitosa (90% de las veces)
-      const isSuccess = Math.random() < 0.4;
-
+      const isSuccess = Math.random() < 0.5; // Simulate a 50% success rate for the update
       if (isSuccess) {
         const updatedProduct: Product = {
           ...this.data.product,
-          ...this.productForm.value
+          ...formValues
         };
-        this.snackBar.open('Producto actualizado correctamente', 'Cerrar', {
+        this.snackBar.open('Product updated successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
@@ -74,13 +94,13 @@ export class EditProductModalComponent implements OnInit {
         });
         this.dialogRef.close(updatedProduct);
       } else {
-        this.snackBar.open('Simulacion: Error al actualizar el producto. Inténtalo de nuevo.', 'Cerrar', {
+        this.snackBar.open('Simulation: Error updating product. Please try again.', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
           panelClass: ['error-snackbar']
         });
-        this.loading = false;
+        this.loading.set(false);
       }
     }, 1500);
   }

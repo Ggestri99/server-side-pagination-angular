@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -12,9 +12,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductService } from '../../core/services/product.service';
 import { Product } from '../../core/models/product.model';
 import { CurrencyPipe } from '../../shared/pipes/currency.pipe';
-import { CurrencyService } from '../../core/services/currency.service';
+import { Currency, CurrencyService } from '../../core/services/currency.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EditProductModalComponent } from './edit/edit-product-modal.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-product-details',
@@ -30,7 +31,8 @@ import { EditProductModalComponent } from './edit/edit-product-modal.component';
     MatDividerModule,
     MatProgressSpinnerModule,
     CurrencyPipe,
-    MatDialogModule
+    MatDialogModule,
+    MatButtonToggleModule
   ],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss']
@@ -41,51 +43,59 @@ export class ProductDetailsComponent implements OnInit {
   private productService = inject(ProductService);
   private currencyService = inject(CurrencyService);
   private dialog = inject(MatDialog);
-  
-  product: Product | null = null;
-  loading = true;
-  error = false;
+
+  product = signal<Product | null>(null);
+  loading = signal<boolean>(true);
+  error = signal<boolean>(false);
+  selectedCurrency = signal<Currency>('USD');
   activeImageIndex = 0;
 
   ngOnInit(): void {
     const productId = this.route.snapshot.paramMap.get('id');
     if (!productId) {
-      this.error = true;
-      this.loading = false;
+      this.error.set(true);
+      this.loading.set(false);
       return;
     }
 
     this.productService.getProductById(Number(productId)).subscribe({
       next: (product) => {
-        this.product = product;
-        this.loading = false;
+        this.product.set(product);
+        this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Error al cargar el producto:', error);
-        this.error = true;
-        this.loading = false;
+      error: () => {
+        this.error.set(true);
+        this.loading.set(false);
+      }
+    });
+
+    this.currencyService.currency$.subscribe(currency => {
+      this.selectedCurrency.set(currency);
+    });
+  }
+
+  changeCurrency(currency: Currency): void {
+    this.currencyService.setCurrency(currency);
+  }
+
+  openEditModal(): void {
+    if (!this.product()) {
+      console.error('No hay producto para editar');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(EditProductModalComponent, {
+      width: '500px',
+      data: { product: this.product() }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.product.set(result);
       }
     });
   }
 
-  openEditModal(): void {
-    if (!this.product) {
-      console.error('No hay producto para editar');
-      return;
-    }
-  
-    const dialogRef = this.dialog.open(EditProductModalComponent, {
-      width: '500px',
-      data: { product: this.product }
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.product = result;
-      }
-    });
-  }
-  
 
   setActiveImage(index: number): void {
     this.activeImageIndex = index;

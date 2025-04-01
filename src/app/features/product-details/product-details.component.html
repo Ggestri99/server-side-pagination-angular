@@ -4,50 +4,52 @@
       <mat-icon>arrow_back</mat-icon> Back to list
     </button>
 
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="openEditModal()"
-      *ngIf="!loading && !error && product"
-    >
+    @if(!loading() && !error() && product()) {
+    <button mat-raised-button color="primary" (click)="openEditModal()">
       <mat-icon>edit</mat-icon> Edit Product
     </button>
+    }
   </div>
 
-  <div *ngIf="loading" class="loading-container">
+  @if (loading()) {
+  <div class="loading-container">
     <mat-spinner></mat-spinner>
   </div>
-
-  <div *ngIf="error" class="error-container">
+  } @if(error()) {
+  <div class="error-container">
     <h2>Oops! Something went wrong.</h2>
     <p>We couldn't load the product information.</p>
     <button mat-raised-button color="primary" (click)="goBack()">
       Back to product list
     </button>
   </div>
-
-  <div *ngIf="!loading && !error && product" class="product-content">
+  } @if(product()) {
+  <div class="product-content">
     <div class="product-header">
-      <h1>{{ product.title }}</h1>
+      <h1>{{ product()?.title }}</h1>
       <div class="product-brand-category">
-        <mat-chip>{{ product.brand }}</mat-chip>
-        <mat-chip>{{ product.category }}</mat-chip>
+        <mat-chip>{{ product()?.brand }}</mat-chip>
+        <mat-chip>{{ product()?.category }}</mat-chip>
       </div>
     </div>
 
     <div class="product-main">
       <div class="product-gallery">
         <div class="main-image">
-          <img [src]="product.images[activeImageIndex]" [alt]="product.title" />
+          <img
+            [src]="product()!.images[activeImageIndex]"
+            [alt]="product()?.title"
+          />
         </div>
         <div class="thumbnails">
+          @for(image of product()!.images; track idx; let idx = $index) {
           <img
-            *ngFor="let image of product.images; let i = index"
             [src]="image"
-            [alt]="'Image ' + (i + 1)"
-            [class.active]="i === activeImageIndex"
-            (click)="setActiveImage(i)"
+            [alt]="'Image ' + (idx + 1)"
+            [class.active]="idx === activeImageIndex"
+            (click)="setActiveImage(idx)"
           />
+          }
         </div>
       </div>
 
@@ -55,40 +57,56 @@
         <mat-card>
           <mat-card-content>
             <div class="price-section">
-              <h2 class="price">
-                {{
-                  getConvertedPrice(product.price)
-                    | currencyFormat : getCurrencySymbol()
-                }}
-              </h2>
-              <div *ngIf="product.discountPercentage > 0" class="discount">
+              <div class="price-info">
+                <h2 class="price">
+                  {{
+                    getConvertedPrice(product()!.price)
+                      | currencyFormat : getCurrencySymbol()
+                  }}
+                </h2>
+                <mat-button-toggle-group
+                  [value]="selectedCurrency()"
+                  (change)="changeCurrency($event.value)"
+                  aria-label="Currency selector"
+                  class="currency-toggle"
+                >
+                  <mat-button-toggle value="USD">USD ($)</mat-button-toggle>
+                  <mat-button-toggle value="EUR">EUR (€)</mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+              @if(product()!.discountPercentage > 0) {
+              <div class="discount">
                 <span class="discount-badge"
-                  >-{{ product.discountPercentage }}%</span
+                  >-{{ product()!.discountPercentage }}%</span
                 >
                 <span class="original-price">{{
                   getConvertedPrice(
-                    product.price / (1 - product.discountPercentage / 100)
+                    product()!.price / (1 - product()!.discountPercentage / 100)
                   ) | currencyFormat : getCurrencySymbol()
                 }}</span>
               </div>
+              }
             </div>
 
             <div class="stock-rating">
-              <div class="stock" [class.low-stock]="product.stock < 10">
+              <div class="stock" [class.low-stock]="product()!.stock < 10">
                 <mat-icon>inventory_2</mat-icon>
-                <span>{{ product.stock }} in stock</span>
+                <span>{{ product()?.stock }} in stock</span>
               </div>
               <div class="rating">
-                <mat-icon *ngFor="let star of [1, 2, 3, 4, 5]">
+                @for(star of [1, 2, 3, 4, 5]; track idx; let idx = $index) {
+                <mat-icon>
                   {{
-                    star <= product.rating
+                    star <= product()!.rating
                       ? "star"
-                      : star - 0.5 <= product.rating
+                      : star - 0.5 <= product()!.rating
                       ? "star_half"
                       : "star_border"
                   }}
                 </mat-icon>
-                <span>{{ product.rating }}/5</span>
+
+                }
+                <span>{{ product()!.rating }}/5</span>
               </div>
             </div>
 
@@ -96,7 +114,7 @@
 
             <div class="description">
               <h3>Description</h3>
-              <p>{{ product.description }}</p>
+              <p>{{ product()?.description }}</p>
             </div>
           </mat-card-content>
         </mat-card>
@@ -109,23 +127,23 @@
           <div class="specs-table">
             <div class="spec-row">
               <div class="spec-label">Brand</div>
-              <div class="spec-value">{{ product.brand }}</div>
+              <div class="spec-value">{{ product()?.brand }}</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">Category</div>
-              <div class="spec-value">{{ product.category }}</div>
+              <div class="spec-value">{{ product()?.category }}</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">Rating</div>
-              <div class="spec-value">{{ product.rating }}/5</div>
+              <div class="spec-value">{{ product()?.rating }}/5</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">Stock</div>
-              <div class="spec-value">{{ product.stock }} units</div>
+              <div class="spec-value">{{ product()?.stock }} units</div>
             </div>
             <div class="spec-row">
               <div class="spec-label">ID</div>
-              <div class="spec-value">{{ product.id }}</div>
+              <div class="spec-value">{{ product()?.id }}</div>
             </div>
           </div>
         </mat-tab>
@@ -135,4 +153,5 @@
       </mat-tab-group>
     </div>
   </div>
+  }
 </div>
